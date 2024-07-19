@@ -113,6 +113,11 @@ public class server {
             }
 
 
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             //与客户端1交互动
             pw1.println("you");
             pw1.flush();
@@ -223,14 +228,22 @@ public class server {
                     pw2.flush();
 
                 }
+
+                //结束战斗
+                try {
+                    if (commend1.equals("bye")){
+                        s1.close();
+                    }
+                    if (commend2.equals("bye")){
+                        s2.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
-
-
-
 
         }
     }
-
-
 
 }

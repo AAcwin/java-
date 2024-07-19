@@ -45,7 +45,7 @@ public class game extends Thread {
     }
 
     public void initial(){
-        //åˆå§‹åŒ–æ¸¸æˆç•Œé¢
+        //³õÊ¼»¯ÓÎÏ·½çÃæ
        down.setPreferredSize(new Dimension(800,100));
        skill.setPreferredSize(new Dimension(100,100));
        up.setPreferredSize(new Dimension(800,150));
@@ -78,34 +78,38 @@ public class game extends Thread {
         name2.setText(character2.getName());
         hp1.setText(Integer.toString(character1.getHp()));
         hp2.setText(Integer.toString(character2.getHp()));
-//æ¸¸æˆç«¯è¿æ¥æœåŠ¡å™¨
+//ÓÎÏ·¶ËÁ¬½Ó·şÎñÆ÷
         BufferedReader br=null;
         PrintWriter prw=null;
         try {
             br=new BufferedReader(new InputStreamReader(socket.getInputStream()));
             prw=new PrintWriter(socket.getOutputStream());
-            //åˆå§‹åŒ–æ”»å‡»æŒ‰é”®
+            //³õÊ¼»¯¹¥»÷°´¼ü
             atk.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     afterAtk=true;
                 }
             });
-            //åˆå§‹åŒ–æŠ€èƒ½æŒ‰é”®
-            skill.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    isSkill=true;
-                    skill.removeActionListener(this);
-                }
-            });
 
-            //ä¸»è¦æµç¨‹
+            if(character1.getId()==4){
+                skill.addActionListener(character1.buff(skill, character2));
+            }
+            //Ö÷ÒªÁ÷³Ì
             while (true){
                 String commend=br.readLine();
-                //ä½œä¸ºè¿›æ”»æ–¹å›åˆ
-                if(commend.equals("you")){
-                    System.out.println("1");
+                character1.buffInitial();
+
+                //×÷Îª½ø¹¥·½»ØºÏ
+                    if(commend.equals("you")){
+                    //³õÊ¼»¯½ø¹¥¼¼ÄÜ
+                    switch (character1.getId()){
+                        case 1:skill.addActionListener(character1.buff(skill));
+                            break;
+                        case 2:if(character1.getHp()<90)skill.addActionListener(character1.buff(skill));
+                            break;
+                    }
+
                     while (true){
                         for (int i=275;i+25>0;i--){
                             drawPanel1.setY(i);
@@ -117,6 +121,7 @@ public class game extends Thread {
                             }
                             if(afterAtk){
                                 goal=i;
+                                System.out.println("µãÊıÊÇ"+goal);
                                 break;
                         }
 
@@ -124,22 +129,23 @@ public class game extends Thread {
                         if(afterAtk){
                             prw.println("next");
                             prw.println(goal);
+                            //½áËãÉËº¦
                             hurt=character1.getHurt(goal);
-                            //ä½¿ç”¨æŠ€èƒ½
-                            if(isSkill){
-                                hurt=character1.skill(character1.getId(),hurt);
-                            }
                             prw.println(hurt);
+                            System.out.println("ÉËº¦ÊÇ"+hurt);
                             prw.flush();
                             afterAtk=false;
                             break;
                         }
                     }
-
                 }
-                //ä½œä¸ºå—å‡»æ–¹å›åˆ
+                //×÷ÎªÊÜ»÷·½»ØºÏ
                 if (commend.equals("he")){
-                    System.out.println("1");
+                    //³õÊ¼»¯·ÀÊØ¼¼ÄÜ
+                    switch (character1.getId()){
+                        case 3:skill.addActionListener(character1.buff(skill));isSkill=true;break;
+                    }
+
                     while (true){
                         for (int i=275;i+25>0;i--){
                             drawPanel2.setY(i);
@@ -158,7 +164,15 @@ public class game extends Thread {
                             String goal=br.readLine();
                             drawPanel2.setY(Integer.parseInt(goal));
                             drawPanel2.repaint();
-                            hurt=character2.getHurt(Integer.parseInt(goal));
+                            hurt=character1.getHurt(Integer.parseInt(goal));
+                            if(isSkill){
+                                isSkill=false;
+                                int guess= character1.getChoice();
+                                if (guess==hurt){
+                                    hurt=0;
+                                    System.out.println("³É¹¦µÖµ²");
+                                }else System.out.println("µÖµ²Ê§°Ü");
+                            }
                             prw.println(hurt);
                             prw.flush();
                             break;
@@ -179,53 +193,29 @@ public class game extends Thread {
                     hp1.repaint();
                 }
 
+                if(character1.getHp()<=0){
+                    System.out.println("¼ÄÁË");
+                    prw.println("bye");
+                    prw.flush();
+                    socket.close();
+                    break;
+                }
+                if(character2.getHp()<=0){
+                    System.out.println("Ó®ÁË");
+                    prw.println("bye");
+                    prw.flush();
+                    socket.close();
+                    break;
+                }
             }
-
-
 
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-
     }
-
-//    public static void main(String[] args) {
-//        game g=new game();
-//        JFrame frame = new JFrame("game");
-//        g.initial();
-//        frame.setSize(800,600);
-//        frame.setContentPane(g.panel1);
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.setVisible(true);
-//    }
-
 
 
 }
 
-
-//æ“æ§ç®­å¤´ç§»åŠ¨
-//class control extends Thread{
-//
-//    private drawPanel imag;
-//    public control(drawPanel d) {
-//        imag=d;
-//    }
-//
-//    @Override
-//    public void run() {
-//        while (true){
-//            for (int i=275;i+25>0;i--){
-//                imag.setY(i);
-//                imag.repaint();
-//                try {
-//                    Thread.sleep(1);
-//                } catch (InterruptedException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            }
-//        }
-//    }
-//}

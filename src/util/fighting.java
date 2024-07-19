@@ -12,16 +12,16 @@ import static UI.logon.frame;
 public class fighting {
 
     public static void main(String[] args) throws InterruptedException {
-        //è·å–åŒæ–¹ç©å®¶çš„ä¿¡æ¯
+        //»ñÈ¡Ë«·½Íæ¼ÒµÄĞÅÏ¢
         message iniMess=new message();
         iniMess.start();
         try {
-            //å¼€å¯é€‰è§’è‰²ç•Œé¢è·å¾—ç©å®¶ä¿¡æ¯
+            //¿ªÆôÑ¡½ÇÉ«½çÃæ»ñµÃÍæ¼ÒĞÅÏ¢
             iniMess.join();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        //æ·»åŠ è§’è‰²
+        //Ìí¼Ó½ÇÉ«
         character c1=new character();
         character c2=new character();
 
@@ -29,13 +29,12 @@ public class fighting {
         c2.setName(iniMess.getNameMessage_());
         c1.setId(iniMess.getCharID());
         c2.setId(iniMess.getCharID_());
-        c1.setHp(100);
-        c2.setHp(100);
 
 
-        //å¼€å§‹æ¸¸æˆ
+        //¿ªÊ¼ÓÎÏ·
         game g2 = new game();
         g2.initial();
+        g2.setSocket(iniMess.getSocket());
         g2.setCharacter1(c1);
         g2.setCharacter2(c2);
 
@@ -45,7 +44,6 @@ public class fighting {
         frame.setVisible(false);
         frame.setVisible(true);
 
-        g2.setSocket(iniMess.getSocket());
         g2.start();
         g2.join();
 
